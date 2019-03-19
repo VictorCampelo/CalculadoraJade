@@ -35,27 +35,30 @@ public class BehaviourControle extends CyclicBehaviour {
 
     }
 
-    private void extrairEq(String exp) {
+    private String extrairEq(String exp) {
+        System.out.println(exp);
         for (int i = 0; i < exp.length(); i++) {
-            if (exp.charAt(i) == '+') {
-                extrairEq(termos(i, exp, 1));
-                break;
-            } else if (exp.charAt(i) == '-') {
-                if (i == 0) {
-                    continue;
-                }
-                extrairEq(termos(i, exp, 2));
+            if (exp.charAt(i) == '*') {
+                exp = extrairEq(termos(i, exp, 3));
                 break;
             }
-//            if (exp.charAt(i) == '/') {
-//                resultado = extrairEq(Soma(i, exp));
-//                break;
-//            }
-//            if (exp.charAt(i) == '*') {
-//                resultado = extrairEq(Soma(i, exp));
-//                break;
-//            }
         }
+        extrairEq3(exp);
+        return exp;
+    }
+
+    private String extrairEq3(String exp) {
+        for (int i = 0; i < exp.length(); i++) {
+            if (exp.charAt(i) == '+') {
+                exp = extrairEq3(termos(i, exp, 1));
+                break;
+            }
+            if (exp.charAt(i) == '-' && i > 0) {
+                exp = extrairEq3(termos(i, exp, 2));
+                break;
+            }
+        }
+        return exp;
     }
 
     private String termos(int i, String exp1, int tipo) throws NumberFormatException {
@@ -70,6 +73,10 @@ public class BehaviourControle extends CyclicBehaviour {
         while (j > 0) {
             if (exp1.charAt(j) == '+') {
                 opLeft = "+";
+                break;
+            }
+            if (exp1.charAt(j) == '*') {
+                opLeft = "*";
                 break;
             }
             if (exp1.charAt(j) == '-') {
@@ -97,19 +104,26 @@ public class BehaviourControle extends CyclicBehaviour {
             System.out.println(exp1.charAt(j));
             expv1 += exp1.charAt(j);
             j++;
-            while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-') {
+            while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' && exp1.charAt(j) != '*') {
                 expv1 += exp1.charAt(j);
                 j++;
             }
-        }
-        else{
-            while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-') {
-                expv1 += exp1.charAt(j);
+        } else {
+            System.out.println("erro aqui");
+            if (j == 0) {
+                while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' && exp1.charAt(j) != '*') {
+                    expv1 += exp1.charAt(j);
+                    j++;
+                }
+            } else {
                 j++;
+                while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' && exp1.charAt(j) != '*') {
+                    expv1 += exp1.charAt(j);
+                    j++;
+                }
             }
+            System.out.println("valor do erro: " + expv1);
         }
-        
-
         v1 = Integer.parseInt(expv1);
         j++;
         //burca o valor da direita do operador
@@ -120,6 +134,10 @@ public class BehaviourControle extends CyclicBehaviour {
             }
             if (exp1.charAt(j) == '-') {
                 opRight = "-";
+                break;
+            }
+            if (exp1.charAt(j) == '*') {
+                opRight = "*";
                 break;
             }
             expv2 += exp1.charAt(j);
@@ -139,7 +157,11 @@ public class BehaviourControle extends CyclicBehaviour {
             case 2:
                 subtracao(v1, v2);
                 break;
+            case 3:
+                multiplicacao(v1, v2);
+                break;
         }
+
         //remontar expressão
         if ("".equals(left) && "".equals(right)) {
             return String.valueOf(obterResposta());
@@ -168,6 +190,17 @@ public class BehaviourControle extends CyclicBehaviour {
         System.out.println("solicitando operacao para subtracao (" + v1 + " - " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(new AID("subtracao", AID.ISLOCALNAME));
+        msg.setLanguage("Portugues");
+        msg.setOntology("OperacaoAritmetica");
+        msg.setContent(v1 + "->" + v2);
+        myAgent.send(msg);
+    }
+
+    private void multiplicacao(int v1, int v2) {
+        ACLMessage msg;
+        System.out.println("solicitando operacao para multiplicacao (" + v1 + " * " + v2 + ")");
+        msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("multiplicacao", AID.ISLOCALNAME));
         msg.setLanguage("Portugues");
         msg.setOntology("OperacaoAritmetica");
         msg.setContent(v1 + "->" + v2);
