@@ -28,7 +28,7 @@ public class BehaviourSubtracao extends Behaviour{
 			valores[0] = Integer.parseInt(dados[0]);
 			valores[1] = Integer.parseInt(dados[1]);
 			result = valores[0] - valores[1];
-			System.out.println("Resolvendo soma: " + valores[0]	+ "+" + valores[1] + " e enviando resultado");
+			System.out.println("Resolvendo Subtracao: " + valores[0]+ "-" + valores[1] + " e enviando resultado");
 			resposta.setPerformative(ACLMessage.INFORM);
 			resposta.setContent("" + result);
 			myAgent.send(resposta);
