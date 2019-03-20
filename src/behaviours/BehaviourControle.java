@@ -29,32 +29,40 @@ public class BehaviourControle extends CyclicBehaviour {
 
         if (msg != null) {
             String conteudo = msg.getContent();
-            extrairEq(conteudo);
+            extrairNivel2(conteudo);
             done();
         }
 
     }
-
-    private String extrairEq(String exp) {
-        System.out.println(exp);
+    
+    private String extrairNivel2(String exp) {
         for (int i = 0; i < exp.length(); i++) {
             if (exp.charAt(i) == '*') {
-                exp = extrairEq(termos(i, exp, 3));
+                exp = extrairNivel4(extrairNivel3(extrairNivel2(termos(i, exp, 3))));
                 break;
             }
         }
-        extrairEq3(exp);
+        return exp;
+    }
+    
+    private String extrairNivel3(String exp) {
+        for (int i = 0; i < exp.length(); i++) {
+            if (exp.charAt(i) == '/') {
+                exp = extrairNivel4(extrairNivel3(termos(i, exp, 4)));
+                break;
+            }
+        }
         return exp;
     }
 
-    private String extrairEq3(String exp) {
+    private String extrairNivel4(String exp) {
         for (int i = 0; i < exp.length(); i++) {
             if (exp.charAt(i) == '+') {
-                exp = extrairEq3(termos(i, exp, 1));
+                exp = extrairNivel4(termos(i, exp, 1));
                 break;
             }
             if (exp.charAt(i) == '-' && i > 0) {
-                exp = extrairEq3(termos(i, exp, 2));
+                exp = extrairNivel4(termos(i, exp, 2));
                 break;
             }
         }
@@ -62,7 +70,9 @@ public class BehaviourControle extends CyclicBehaviour {
     }
 
     private String termos(int i, String exp1, int tipo) throws NumberFormatException {
-        ACLMessage msg;
+        
+        System.out.println(exp1);
+        
         String left = "";
         String right = "";
         String opLeft = "";
@@ -71,12 +81,16 @@ public class BehaviourControle extends CyclicBehaviour {
         int j = i - 1;
         //busca o valor da esquerda do operador
         while (j > 0) {
-            if (exp1.charAt(j) == '+') {
-                opLeft = "+";
-                break;
-            }
             if (exp1.charAt(j) == '*') {
                 opLeft = "*";
+                break;
+            }
+            if (exp1.charAt(j) == '/') {
+                opLeft = "/";
+                break;
+            }
+            if (exp1.charAt(j) == '+') {
+                opLeft = "+";
                 break;
             }
             if (exp1.charAt(j) == '-') {
@@ -104,20 +118,23 @@ public class BehaviourControle extends CyclicBehaviour {
             System.out.println(exp1.charAt(j));
             expv1 += exp1.charAt(j);
             j++;
-            while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' && exp1.charAt(j) != '*') {
+            while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' 
+                && exp1.charAt(j) != '*' && exp1.charAt(j) != '/') {
                 expv1 += exp1.charAt(j);
                 j++;
             }
         } else {
             System.out.println("erro aqui");
             if (j == 0) {
-                while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' && exp1.charAt(j) != '*') {
+                while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' 
+                    && exp1.charAt(j) != '*' && exp1.charAt(j) != '/') {
                     expv1 += exp1.charAt(j);
                     j++;
                 }
             } else {
                 j++;
-                while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' && exp1.charAt(j) != '*') {
+                while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' 
+                    && exp1.charAt(j) != '*' && exp1.charAt(j) != '/') {
                     expv1 += exp1.charAt(j);
                     j++;
                 }
@@ -128,16 +145,20 @@ public class BehaviourControle extends CyclicBehaviour {
         j++;
         //burca o valor da direita do operador
         while (j < exp1.length()) {
+            if (exp1.charAt(j) == '*') {
+                opRight = "*";
+                break;
+            }
+            if (exp1.charAt(j) == '/') {
+                opRight = "/";
+                break;
+            }
             if (exp1.charAt(j) == '+') {
                 opRight = "+";
                 break;
             }
             if (exp1.charAt(j) == '-') {
                 opRight = "-";
-                break;
-            }
-            if (exp1.charAt(j) == '*') {
-                opRight = "*";
                 break;
             }
             expv2 += exp1.charAt(j);
@@ -159,6 +180,9 @@ public class BehaviourControle extends CyclicBehaviour {
                 break;
             case 3:
                 multiplicacao(v1, v2);
+                break;
+            case 4:
+                divisao(v1, v2);
                 break;
         }
 
@@ -201,6 +225,17 @@ public class BehaviourControle extends CyclicBehaviour {
         System.out.println("solicitando operacao para multiplicacao (" + v1 + " * " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(new AID("multiplicacao", AID.ISLOCALNAME));
+        msg.setLanguage("Portugues");
+        msg.setOntology("OperacaoAritmetica");
+        msg.setContent(v1 + "->" + v2);
+        myAgent.send(msg);
+    }
+    
+    private void divisao(int v1, int v2) {
+        ACLMessage msg;
+        System.out.println("solicitando operacao para multiplicacao (" + v1 + " / " + v2 + ")");
+        msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("divisao", AID.ISLOCALNAME));
         msg.setLanguage("Portugues");
         msg.setOntology("OperacaoAritmetica");
         msg.setContent(v1 + "->" + v2);
