@@ -29,6 +29,7 @@ public class BehaviourControle extends CyclicBehaviour {
 
         if (msg != null) {
             String conteudo = msg.getContent();
+            System.out.println(conteudo);
             extrairNivel0(conteudo);
             done();
         }
@@ -36,58 +37,51 @@ public class BehaviourControle extends CyclicBehaviour {
     }
 
     private String extrairNivel0(String exp) {
-        String aux = "";
         String left = "";
         String right = "";
         String nova = exp;
         for (int i = 0; i < exp.length(); i++) {
             if (exp.charAt(i) == '(') {
                 if (i == 0) {
+                    String aux = "";
                     for (int j = i + 1; j < exp.length(); j++) {
-                        switch (exp.charAt(j)) {
-                            case '(':
-                                while (exp.charAt(j) != ')') {
-                                    aux += exp.charAt(j);
-                                    j++;
-                                }   break;
-                            case ')':
-                                aux = extrairNivel0(aux);
-                                for (int k = j+1; k < exp.length(); k++) {
-                                    right += exp.charAt(k);
-                                }   nova = aux + right;
-                                System.out.println("nova: " + nova);
-                                extrairNivel0(nova);
-                                break;
-                            default:
+                        if (exp.charAt(j) == '(') {
+                            while (exp.charAt(j) != ')') {
                                 aux += exp.charAt(j);
-                                break;
+                                j++;
+                            }
+                            aux += exp.charAt(j);
+                            continue;
                         }
+                        if (exp.charAt(j) == ')') {
+                            aux = extrairNivel0(aux);
+                            exp = aux + exp.substring(j+1);
+                            break;
+                        }
+                        aux += exp.charAt(j);
                     }
                 } else if (i > 0 && i < exp.length()) {
+                    String aux = "";
                     for (int j = i + 1; j < exp.length(); j++) {
-                        if (exp.charAt(j) == ')') {
-                            if (exp.charAt(j) == '(') {
-                                while (exp.charAt(j) != ')') {
-                                    aux += exp.charAt(j);
-                                    j++;
-                                }
+                        if (exp.charAt(j) == '(') {
+                            while (exp.charAt(j) != ')') {
+                                aux += exp.charAt(j);
+                                j++;
                             }
-                            aux = extrairNivel0(aux);
-                            for (int k = j+1; k < exp.length(); k++) {
-                                right += exp.charAt(k);
-                            }
-                            nova = left + aux + right;
-                            System.out.println("nova: " + nova);
-                            extrairNivel0(nova);
-                        } else {
                             aux += exp.charAt(j);
+                            continue;
                         }
+                        if (exp.charAt(j) == ')') {
+                            aux = extrairNivel0(aux);
+                            exp = exp.substring(0, i)+aux+exp.substring(j+1);
+                            break;
+                        }
+                        aux += exp.charAt(j);
                     }
                 }
             }
-            left += exp.charAt(i);
         }
-        return extrairNivel4(extrairNivel3(extrairNivel2((extrairNivel1((nova))))));
+        return extrairNivel4(extrairNivel3(extrairNivel2((extrairNivel1((exp))))));
     }
 
     private String extrairNivel1(String exp) {
@@ -123,28 +117,28 @@ public class BehaviourControle extends CyclicBehaviour {
     private String extrairNivel4(String exp) {
         for (int i = 0; i < exp.length(); i++) {
             if (exp.charAt(i) == '+') {
-                if(exp.charAt(i+1) == '-'){
-                    String aux = exp.substring(0,i-1) +"-"+ exp.substring(i+2);
-                    exp = extrairNivel4(termos(i,aux,2));
+                if (exp.charAt(i + 1) == '-') {
+                    String aux = exp.substring(0, i - 1) + "-" + exp.substring(i + 2);
+                    exp = extrairNivel4(termos(i, aux, 2));
                     break;
                 }
-                if(exp.charAt(i+1) == '+'){
-                    String aux = exp.substring(0,i-1) +"+"+ exp.substring(i+2);
-                    exp = extrairNivel4(termos(i,aux,1));
+                if (exp.charAt(i + 1) == '+') {
+                    String aux = exp.substring(0, i - 1) + "+" + exp.substring(i + 2);
+                    exp = extrairNivel4(termos(i, aux, 1));
                     break;
                 }
                 exp = extrairNivel4(termos(i, exp, 1));
                 break;
             }
             if (exp.charAt(i) == '-' && i > 0) {
-                if(exp.charAt(i+1) == '+'){
-                    String aux = exp.substring(0,i-1) +"-"+ exp.substring(i+2);
-                    exp = extrairNivel4(termos(i,aux,2));
+                if (exp.charAt(i + 1) == '+') {
+                    String aux = exp.substring(0, i - 1) + "-" + exp.substring(i + 2);
+                    exp = extrairNivel4(termos(i, aux, 2));
                     break;
                 }
-                if(exp.charAt(i+1) == '-'){
-                    String aux = exp.substring(0,i-1) +"+"+ exp.substring(i+2);
-                    exp = extrairNivel4(termos(i,aux,1));
+                if (exp.charAt(i + 1) == '-') {
+                    String aux = exp.substring(0, i - 1) + "+" + exp.substring(i + 2);
+                    exp = extrairNivel4(termos(i, aux, 1));
                     break;
                 }
                 exp = extrairNivel4(termos(i, exp, 2));
@@ -156,7 +150,7 @@ public class BehaviourControle extends CyclicBehaviour {
 
     private String termos(int i, String exp1, int tipo) throws NumberFormatException {
         //encontrar os valores parentes desse operador
-        System.out.println(exp1);
+        System.out.println("Expressao atual: "+exp1);
         String left = "";
         String right = "";
         String opLeft = "";
@@ -243,7 +237,7 @@ public class BehaviourControle extends CyclicBehaviour {
                 opRight = "/";
                 break;
             }
-            if (exp1.charAt(j) == '+') {             
+            if (exp1.charAt(j) == '+') {
                 opRight = "+";
                 break;
             }
