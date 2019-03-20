@@ -29,12 +29,22 @@ public class BehaviourControle extends CyclicBehaviour {
 
         if (msg != null) {
             String conteudo = msg.getContent();
-            extrairNivel2(conteudo);
+            extrairNivel1(conteudo);
             done();
         }
 
     }
     
+    private String extrairNivel1(String exp) {
+        for (int i = 0; i < exp.length(); i++) {
+            if (exp.charAt(i) == '^') {
+                exp = extrairNivel4(extrairNivel3(extrairNivel2((extrairNivel1(termos(i, exp, 5))))));
+                break;
+            }
+        }
+        return exp;
+    }
+ 
     private String extrairNivel2(String exp) {
         for (int i = 0; i < exp.length(); i++) {
             if (exp.charAt(i) == '*') {
@@ -70,17 +80,19 @@ public class BehaviourControle extends CyclicBehaviour {
     }
 
     private String termos(int i, String exp1, int tipo) throws NumberFormatException {
-        
+        //encontrar os valores parentes desse operador
         System.out.println(exp1);
-        
         String left = "";
         String right = "";
         String opLeft = "";
         String opRight = "";
-        //encontrar os valores parentes desse operador
         int j = i - 1;
         //busca o valor da esquerda do operador
         while (j > 0) {
+            if (exp1.charAt(j) == '^') {
+                opLeft = "^";
+                break;
+            }
             if (exp1.charAt(j) == '*') {
                 opLeft = "*";
                 break;
@@ -103,7 +115,6 @@ public class BehaviourControle extends CyclicBehaviour {
             }
             j--;
         }
-        System.out.println(j);
 
         //guarda a expressão do lado esquerdo do fator analisado
         for (int k = 0; k < j; k++) {
@@ -113,38 +124,42 @@ public class BehaviourControle extends CyclicBehaviour {
         String expv1 = "";
         String expv2 = "";
         int v1, v2;
-
+        //formar a String que forma correntamente o numero do lado esquerdo do operados avaliado
         if (j == 0 && exp1.charAt(j) == '-') {
-            System.out.println(exp1.charAt(j));
             expv1 += exp1.charAt(j);
             j++;
             while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' 
-                && exp1.charAt(j) != '*' && exp1.charAt(j) != '/') {
+                && exp1.charAt(j) != '*' && exp1.charAt(j) != '/'
+                && exp1.charAt(j) != '^') {
                 expv1 += exp1.charAt(j);
                 j++;
             }
         } else {
-            System.out.println("erro aqui");
             if (j == 0) {
                 while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' 
-                    && exp1.charAt(j) != '*' && exp1.charAt(j) != '/') {
+                    && exp1.charAt(j) != '*' && exp1.charAt(j) != '/'
+                    && exp1.charAt(j) != '^') {
                     expv1 += exp1.charAt(j);
                     j++;
                 }
             } else {
                 j++;
                 while (exp1.charAt(j) != '+' && exp1.charAt(j) != '-' 
-                    && exp1.charAt(j) != '*' && exp1.charAt(j) != '/') {
+                    && exp1.charAt(j) != '*' && exp1.charAt(j) != '/'
+                    && exp1.charAt(j) != '^') {
                     expv1 += exp1.charAt(j);
                     j++;
                 }
             }
-            System.out.println("valor do erro: " + expv1);
         }
         v1 = Integer.parseInt(expv1);
         j++;
         //burca o valor da direita do operador
         while (j < exp1.length()) {
+            if (exp1.charAt(j) == '^') {
+                opRight = "^";
+                break;
+            }
             if (exp1.charAt(j) == '*') {
                 opRight = "*";
                 break;
@@ -183,6 +198,9 @@ public class BehaviourControle extends CyclicBehaviour {
                 break;
             case 4:
                 divisao(v1, v2);
+                break;
+            case 5:
+                potencia(v1, v2);
                 break;
         }
 
@@ -236,6 +254,17 @@ public class BehaviourControle extends CyclicBehaviour {
         System.out.println("solicitando operacao para multiplicacao (" + v1 + " / " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(new AID("divisao", AID.ISLOCALNAME));
+        msg.setLanguage("Portugues");
+        msg.setOntology("OperacaoAritmetica");
+        msg.setContent(v1 + "->" + v2);
+        myAgent.send(msg);
+    }
+
+    private void potencia(int v1, int v2) {
+        ACLMessage msg;
+        System.out.println("solicitando operacao para potencia (" + v1 + "^" + v2 + ")");
+        msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("potencia", AID.ISLOCALNAME));
         msg.setLanguage("Portugues");
         msg.setOntology("OperacaoAritmetica");
         msg.setContent(v1 + "->" + v2);
