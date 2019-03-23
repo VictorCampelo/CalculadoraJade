@@ -1,12 +1,10 @@
 package agents;
 
 import behaviours.BehaviourSoma;
-import behaviours.BehaviourControle;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 
 public class Soma extends Agent{
-    private int valores[];
+    private double valores[];
 	
 	private static final long serialVersionUID = 1L;
 

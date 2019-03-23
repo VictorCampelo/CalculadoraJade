@@ -15,7 +15,6 @@ import jade.lang.acl.ACLMessage;
  * @author Victor Campelo
  */
 public class BehaviourControle extends CyclicBehaviour {
-
     private String exp = "";
 
     public BehaviourControle(Controle aThis, String expresao) {
@@ -118,12 +117,13 @@ public class BehaviourControle extends CyclicBehaviour {
         for (int i = 0; i < exp.length(); i++) {
             if (exp.charAt(i) == '+') {
                 if (exp.charAt(i + 1) == '-') {
-                    String aux = exp.substring(0, i - 1) + "-" + exp.substring(i + 2);
+                    String aux = exp.substring(0, i) + "-" + exp.substring(i + 2);
+                    System.out.println("erro aqui: "+aux);
                     exp = extrairNivel4(termos(i, aux, 2));
                     break;
                 }
                 if (exp.charAt(i + 1) == '+') {
-                    String aux = exp.substring(0, i - 1) + "+" + exp.substring(i + 2);
+                    String aux = exp.substring(0, i) + "+" + exp.substring(i + 2);
                     exp = extrairNivel4(termos(i, aux, 1));
                     break;
                 }
@@ -132,12 +132,12 @@ public class BehaviourControle extends CyclicBehaviour {
             }
             if (exp.charAt(i) == '-' && i > 0) {
                 if (exp.charAt(i + 1) == '+') {
-                    String aux = exp.substring(0, i - 1) + "-" + exp.substring(i + 2);
+                    String aux = exp.substring(0, i) + "-" + exp.substring(i + 2);
                     exp = extrairNivel4(termos(i, aux, 2));
                     break;
                 }
                 if (exp.charAt(i + 1) == '-') {
-                    String aux = exp.substring(0, i - 1) + "+" + exp.substring(i + 2);
+                    String aux = exp.substring(0, i) + "+" + exp.substring(i + 2);
                     exp = extrairNivel4(termos(i, aux, 1));
                     break;
                 }
@@ -192,7 +192,7 @@ public class BehaviourControle extends CyclicBehaviour {
 
         String expv1 = "";
         String expv2 = "";
-        int v1, v2;
+        double v1, v2;
         //formar a String que forma correntamente o numero do lado esquerdo do operados avaliado
         if (j == 0 && exp1.charAt(j) == '-') {
             expv1 += exp1.charAt(j);
@@ -221,7 +221,7 @@ public class BehaviourControle extends CyclicBehaviour {
                 }
             }
         }
-        v1 = Integer.parseInt(expv1);
+        v1 = Double.parseDouble(expv1);
         j++;
         //burca o valor da direita do operador
         while (j < exp1.length()) {
@@ -259,7 +259,7 @@ public class BehaviourControle extends CyclicBehaviour {
             right += exp1.charAt(k);
         }
 
-        v2 = Integer.parseInt(expv2);
+        v2 = Double.parseDouble(expv2);
 
         switch (tipo) {
             case 1:
@@ -291,7 +291,7 @@ public class BehaviourControle extends CyclicBehaviour {
         }
     }
 
-    private void soma(int v1, int v2) {
+    private void soma(double v1, double v2) {
         ACLMessage msg;
         System.out.println("solicitando operacao para AgenteSoma (" + v1 + " + " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
@@ -302,7 +302,7 @@ public class BehaviourControle extends CyclicBehaviour {
         myAgent.send(msg);
     }
 
-    private void subtracao(int v1, int v2) {
+    private void subtracao(double v1, double v2) {
         ACLMessage msg;
         System.out.println("solicitando operacao para subtracao (" + v1 + " - " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
@@ -313,7 +313,7 @@ public class BehaviourControle extends CyclicBehaviour {
         myAgent.send(msg);
     }
 
-    private void multiplicacao(int v1, int v2) {
+    private void multiplicacao(double v1, double v2) {
         ACLMessage msg;
         System.out.println("solicitando operacao para multiplicacao (" + v1 + " * " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
@@ -324,7 +324,7 @@ public class BehaviourControle extends CyclicBehaviour {
         myAgent.send(msg);
     }
 
-    private void divisao(int v1, int v2) {
+    private void divisao(double v1, double v2) {
         ACLMessage msg;
         System.out.println("solicitando operacao para multiplicacao (" + v1 + " / " + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
@@ -335,7 +335,7 @@ public class BehaviourControle extends CyclicBehaviour {
         myAgent.send(msg);
     }
 
-    private void potencia(int v1, int v2) {
+    private void potencia(double v1, double v2) {
         ACLMessage msg;
         System.out.println("solicitando operacao para potencia (" + v1 + "^" + v2 + ")");
         msg = new ACLMessage(ACLMessage.INFORM);
@@ -346,15 +346,15 @@ public class BehaviourControle extends CyclicBehaviour {
         myAgent.send(msg);
     }
 
-    private int obterResposta() {
-        int resultado = 0;
+    private double obterResposta() {
+        double resultado = 0;
         boolean calculado = true;
         ACLMessage msg;
         do {
             msg = myAgent.receive();
 
             if (msg != null) {
-                resultado = Integer.parseInt(msg.getContent());
+                resultado = Double.parseDouble(msg.getContent());
                 System.out.println("Agente controle: " + msg.getSender().getName() + " enviou resultado: " + resultado);
                 calculado = false;
             }
