@@ -55,7 +55,7 @@ public class BehaviourControle extends CyclicBehaviour {
                         }
                         if (exp.charAt(j) == ')') {
                             aux = extrairNivel0(aux);
-                            exp = aux + exp.substring(j+1);
+                            exp = aux + exp.substring(j + 1);
                             break;
                         }
                         aux += exp.charAt(j);
@@ -73,7 +73,7 @@ public class BehaviourControle extends CyclicBehaviour {
                         }
                         if (exp.charAt(j) == ')') {
                             aux = extrairNivel0(aux);
-                            exp = exp.substring(0, i)+aux+exp.substring(j+1);
+                            exp = exp.substring(0, i) + aux + exp.substring(j + 1);
                             break;
                         }
                         aux += exp.charAt(j);
@@ -150,7 +150,7 @@ public class BehaviourControle extends CyclicBehaviour {
 
     private String termos(int i, String exp1, int tipo) throws NumberFormatException {
         //encontrar os valores parentes desse operador
-        System.out.println("Expressao atual: "+exp1);
+        System.out.println("Expressao atual: " + exp1);
         String left = "";
         String right = "";
         String opLeft = "";
@@ -242,8 +242,14 @@ public class BehaviourControle extends CyclicBehaviour {
                 break;
             }
             if (exp1.charAt(j) == '-') {
-                opRight = "-";
-                break;
+                if (exp1.charAt(j - 1) == '*' || exp1.charAt(j - 1) == '/' || exp1.charAt(j - 1) == '^') {
+                    System.out.println(exp1.charAt(j - 1));
+                    expv2 += exp1.charAt(j);
+                    j++;
+                } else {
+                    opRight = "-";
+                    break;
+                }
             }
             expv2 += exp1.charAt(j);
             j++;
